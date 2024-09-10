@@ -1,0 +1,85 @@
+Q: NDK编译时，先使用动态c++，然后修改参数使用静态c++，编译不成功，c++符号找不到
+A: 动态编译使用的c++静态库为gun, 后面改为静态编译时使用的是llvm，但是如果不清cmake缓存，则一直和原来一样使用gun的静态库，导致c++的符号找不到
+注：libc++(llvm) 命名空间 std::__ndk1; gunstl命名空间std; 安卓c++命名空间std::__1；
+
+
+Q: cmake链接库时一直链接不到，找不到符合
+A: 1. 如果库是通过add_subdirectory生成，则需要在target_link_libraries中添加子cmake的项目名如target_link_libraries(${PROJECT_NAME} elevoc_ns);
+   2. 如果库是从外部导入，则target_link_libraries时需要完整的绝对路径，如target_link_libraries(${PROJECT_NAME} d:/xxx/xx/xx.so);
+   3. 如果是当前cmake的test程序需要链接库，则target_link_libraries(test ${PROJECT_NAME});
+   
+Q: cmake中的常量路径
+A: 1. ${CMAKE_CURRENT_SOURCE_DIR} CMakeLists.txt所在目录
+
+Q: Qt编译时有WINDOWS RUNTIME140.DLL的依赖
+A: 添加以下
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MT")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MT")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MT")
+
+Q: 查看exe依赖的库
+A: dumpbin /DEPENDENTS C:\Users\PC\Desktop\audio_zoom_pak\audio_zoom_test.exe
+
+Q: QT打包release
+A: windeployqt --release ./audio_zoom_test.exe
+
+
+Q: clang++编译器使用stdc++标准库
+A: set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libstdc++")
+
+
+Q: clang++编译处的so库去除对c++.so的依赖
+A: set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -static-libstdc++")
+
+Q: Cmake中引用外部库
+A: 	add_library(nn_engine SHARED IMPORTED)  #cmake中添加一个库
+	set_target_properties(nn_engine PROPERTIES
+			IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/Elevoc_nn_engine.lib"	#外部库路径
+			INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/lib/inc"	#外部库头文件路径
+			)
+	target_link_libraries(elevocns_skel PUBLIC nn_engine)	#链接外部库
+	
+	
+Q: 指定python调用pip
+A: python3 -m pip install  websockets
+
+Q: cmake链接一个库时，如何忽略这个库的其他依赖
+A:  target_link_libraries(mi_sys INTERFACE cam_os) #链接cam_os库
+	target_link_options(mi_sys INTERFACE -Wl,--allow-shlib-undefined)  #忽略cam_os对其他库的依赖
+	
+
+Q: cmake如何清除rpath
+A: set_target_properties(${PROJECT_NAME} PROPERTIES
+    BUILD_WITH_INSTALL_RPATH FALSE
+    INSTALL_RPATH ""
+    SKIP_BUILD_RPATH TRUE
+    CMAKE_SKIP_RPATH TRUE
+)
+
+Q: cmake链接第三方库时，如何去掉依赖中的绝对路径(readelf -d可查看到)
+A:  
+方法一：
+	add_library(cam_os SHARED IMPORTED)  #cmake中添加一个库
+	#这里设置三个参数即可去掉依赖
+	set_target_properties(cam_os PROPERTIES
+		IMPORTED_LOCATION_RELEASE "/home/asd/test/project/release/chip/p5/sigma_common_libs/glibc/11.1.0/dynamic/libcam_os_wrapper.so"	#外部库路径
+		IMPORTED_NO_SONAME_RELEASE true
+		IMPORTED_CONFIGURATIONS RELEASE
+	)
+	
+方法二：
+	target_link_directories(mi_sys INTERFACE /home/asd/test/project/release/chip/p5/sigma_common_libs/glibc/11.1.0/dynamic/)
+	target_link_libraries(mi_sys INTERFACE -lcam_os_wrapper)
+	
+Q: 高通h2xml.exe的使用方法
+A: h2xml.exe -conf D:\Projects\Elevoc\Qualcomm\Hexagon_SDK\3.5.1\tools\audio\h2xml\bin\config_adsp.xml -I D:\Projects\Elevoc\Qualcomm\Hexagon_SDK\3.5.1\incs\audio\ -i D:\Projects\Elevoc\car\roxmotor_car\adsp\capi2\inc\h2xml_tx_ecns.h -o D:\Projects\Elevoc\car\roxmotor_car\adsp\capi2\inc		
+
+Q: cmake隐藏c++符号和未导出符号
+A: set(CMAKE_C_VISIBILITY_PRESET hidden)  set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+
+Q: 断开所有网络文件夹连接
+A: net use * /del /y
+
+Q: ADB SHELL查看进程的内存占用
+A: dumpsys meminfo [进程名]
