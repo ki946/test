@@ -1,0 +1,44 @@
+##需要root
+
+##查询cpu所有核支持的频率调度模式
+adb shell cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_available_governors 
+
+##查看cpu所有核支持的频率
+adb shell cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_available_frequencies
+
+##查询cpu所有核目前的频率调度方式
+adb shell cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+
+##查询cpu所有核目前的频率
+adb shell "watch -n 0.5 "cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq""
+adb shell cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq
+
+##设置cpu频率调度模式修改为用户自定义
+adb shell "echo "userspace" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor"
+adb shell "echo "userspace" > /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor"
+adb shell "echo "userspace" > /sys/devices/system/cpu/cpu7/cpufreq/scaling_governor"
+
+##设置cpu的频率，""中的值应该是cpu支持的频率（scaling_available_frequencies中的值）
+
+# 高通8155
+adb shell "echo "1209600" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_setspeed"
+adb shell "echo "710400" > /sys/devices/system/cpu/cpu4/cpufreq/scaling_setspeed"
+adb shell "echo "825600" > /sys/devices/system/cpu/cpu7/cpufreq/scaling_setspeed"
+
+adb shell "echo "1632000" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_setspeed"
+adb shell "echo "2016000" > /sys/devices/system/cpu/cpu4/cpufreq/scaling_setspeed"
+adb shell "echo "2323200" > /sys/devices/system/cpu/cpu7/cpufreq/scaling_setspeed"
+
+adb shell "echo "1785600" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_setspeed"
+adb shell "echo "2131200" > /sys/devices/system/cpu/cpu4/cpufreq/scaling_setspeed"
+adb shell "echo "2419200" > /sys/devices/system/cpu/cpu7/cpufreq/scaling_setspeed"
+
+adb shell "echo "schedutil" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor"
+adb shell "echo "schedutil" > /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor"
+adb shell "echo "schedutil" > /sys/devices/system/cpu/cpu7/cpufreq/scaling_governor"
+
+# MT8666
+adb shell "echo "userspace" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor"
+adb shell "echo "userspace" > /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor"
+adb shell "echo "1014000" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_setspeed"
+adb shell "echo "1014000" > /sys/devices/system/cpu/cpu4/cpufreq/scaling_setspeed"
